@@ -1,5 +1,8 @@
 # blocauth
 
+![BlocAuth](https://user-images.githubusercontent.com/62777613/230127325-7cb41218-0275-4d6b-88e3-de9ecef3e38c.PNG)
+
+
 A new Flutter project.
 
 ## Getting Started
