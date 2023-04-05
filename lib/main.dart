@@ -1,3 +1,4 @@
+import 'package:blocauth/provider/internet_provider.dart';
 import 'package:blocauth/provider/sign_in_provider.dart';
 import 'package:blocauth/screens/splash_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: ((context) => SignInProvider()),)
+        ChangeNotifierProvider(create: ((context) => SignInProvider())),
+        ChangeNotifierProvider(create: ((context) => InternetProvider())), 
       ],
       child: const MaterialApp(
         debugShowCheckedModeBanner: false,
