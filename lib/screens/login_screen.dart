@@ -1,6 +1,9 @@
+import 'package:blocauth/provider/internet_provider.dart';
+import 'package:blocauth/provider/sign_in_provider.dart';
 import 'package:blocauth/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -68,7 +71,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 children: [
                   RoundedLoadingButton(
                     controller: googleController, 
-                    onPressed: (){}, 
+                    onPressed: (){
+                      handleGoogleSignIn();
+                    }, 
                     successColor: Colors.red,
                     width: MediaQuery.of(context).size.width * 0.80,
                     elevation: 0,
@@ -138,4 +143,17 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
+
+  // handling google sigin in
+  Future handleGoogleSignIn() async {
+    final sp = context.read<SignInProvider>();
+    final ip = context.read<InternetProvider>();
+    await ip.checkInternetConnection();
+
+    if(ip.hasInternet == false){
+      
+    }
+
+  }
+
 }
