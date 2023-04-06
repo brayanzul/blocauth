@@ -1,6 +1,9 @@
 import 'package:blocauth/provider/internet_provider.dart';
 import 'package:blocauth/provider/sign_in_provider.dart';
+import 'package:blocauth/screens/home_screen.dart';
 import 'package:blocauth/utils/config.dart';
+import 'package:blocauth/utils/next_screen.dart';
+import 'package:blocauth/utils/snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
@@ -151,9 +154,47 @@ class _LoginScreenState extends State<LoginScreen> {
     await ip.checkInternetConnection();
 
     if(ip.hasInternet == false){
-      
+      openSnackbar(context, "Check your Internet connection", Colors.red);
+      googleController.reset();
+    } else {
+      await sp.signInWithGoogle().then((value) {
+        if(sp.hasError == true) {
+          openSnackbar(context, sp.errorCode.toString(), Colors.red);
+          googleController.reset();
+        }
+        else {
+          // checking whether user exists or not
+          sp.checkUserExists().then((value) async {
+            if(value == true) {
+              // user exists
+              await sp.getUserDataFromFirestore(sp.uid).then((value) => 
+                sp.saveDataToSharedPreferences()
+                .then((value) => sp.setSignIn().then((value) {
+                  googleController.success();
+                  handleAfterSignIn();
+                })));
+            }
+            else {
+              // user does not exist
+              sp.saveDataToFirestore().then((value) => 
+                sp.saveDataToSharedPreferences()
+                .then((value) => sp.setSignIn().then((value) {
+                  googleController.success();
+                  handleAfterSignIn();
+                })));
+            }
+          });
+        }
+      });
     }
 
+  }
+
+  // handle after signin
+  handleAfterSignIn() {
+    Future.delayed(const Duration(milliseconds: 1000)).then((value) {
+      nextScreenReplace(context, const HomeScreen());
+    });
   }
 
 }
