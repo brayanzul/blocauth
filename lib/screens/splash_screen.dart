@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../provider/sign_in_provider.dart';
 import '../utils/config.dart';
+import '../utils/next_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -25,10 +26,8 @@ class _SplashScreenState extends State<SplashScreen> {
     // create a timer of 2 seconds
     Timer(const Duration(seconds: 2), () {
       sp.isSignedIn == false
-        ? Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()))
-        : Navigator.pushReplacement(context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()));
+        ? nextScreen(context, const LoginScreen())
+        : nextScreen(context, const HomeScreen());
     });
   }
 

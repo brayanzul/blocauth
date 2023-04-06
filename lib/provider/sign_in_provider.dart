@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
@@ -43,6 +44,13 @@ class SignInProvider extends ChangeNotifier {
   Future checkSignInUser() async {
     final SharedPreferences s = await SharedPreferences.getInstance();
     _isSignedIn = s.getBool("signed_in") ?? false;
+    notifyListeners();
+  }
+
+  Future setSignIn() async {
+    final SharedPreferences s = await SharedPreferences.getInstance();
+    s.setBool("sign_in", true);
+    _isSignedIn = true;
     notifyListeners();
   }
 
@@ -99,4 +107,79 @@ class SignInProvider extends ChangeNotifier {
     }
   }
 
+  // Entry for CloudFirestore
+  Future getUserDataFromFirestore(uid) async {
+    await FirebaseFirestore.instance
+     .collection("users")
+     .doc(uid)
+     .get()
+     .then((DocumentSnapshot snapshot) => {
+      _uid = snapshot['uid'],
+      _name = snapshot['name'],
+      _email = snapshot['email'],
+      _imageUrl = snapshot['image_url'],
+      _provider = snapshot['provider'],
+    });
+  }
+
+  Future saveDataToFirestore() async {
+    final DocumentReference r = 
+      FirebaseFirestore.instance.collection("users").doc(uid);
+    await r.set({
+      "name": _name,
+      "email": _email,
+      "uid": _uid,
+      "image_url": _imageUrl,
+      "provider": _provider,
+    });
+    notifyListeners();
+  }
+
+  Future saveDataToSharedPreferences() async {
+    final SharedPreferences s = await SharedPreferences.getInstance();
+    await s.setString('name', _name!);
+    await s.setString('email', _email!);
+    await s.setString('uid', _uid!);
+    await s.setString('image_url', _imageUrl!);
+    await s.setString('provider', _provider!);
+    notifyListeners();
+  }
+
+  Future getDataFromSharedPreferences() async {
+    final SharedPreferences s = await SharedPreferences.getInstance();
+    _name = s.getString('name');
+    _email = s.getString('email');
+    _imageUrl = s.getString('image_url');
+    _uid = s.getString('uid');
+    _provider = s.getString('provider');
+    notifyListeners();
+  }
+
+  // checkUser exists or not in cloudfirestore
+  Future<bool> checkUserExists() async {
+    DocumentSnapshot snap =
+        await FirebaseFirestore.instance.collection('users').doc(_uid).get();
+    if (snap.exists) {
+      print("EXISTING USER");
+      return true;
+    } else {
+      print("NEW USER");
+      return false;
+    }
+  }
+
+  // signout
+  Future userSignOut() async {
+    await firebaseAuth.signOut();
+    await googleSignIn.signOut();
+    _isSignedIn = false;
+    notifyListeners();
+    // clear all storage information
+    clearStoredData();
+  }
+
+  Future clearStoredData() async {
+    final SharedPreferences s = await SharedPreferences.getInstance();
+    s.clear();
+  }
 }
