@@ -2,6 +2,8 @@
 
 ![BlocAuth](https://user-images.githubusercontent.com/62777613/230127325-7cb41218-0275-4d6b-88e3-de9ecef3e38c.PNG)
 
+![BlocAuth2](https://user-images.githubusercontent.com/62777613/230692336-6535e6c7-a98b-4465-b653-79a20cd59116.PNG)
+
 
 A new Flutter project.
 
