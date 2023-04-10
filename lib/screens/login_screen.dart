@@ -20,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final GlobalKey _scaffoldKey = GlobalKey<ScaffoldState>();
   final RoundedLoadingButtonController googleController = RoundedLoadingButtonController();
   final RoundedLoadingButtonController facebookController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController twitterController = RoundedLoadingButtonController();
 
   @override
   Widget build(BuildContext context) {
@@ -138,6 +139,41 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  // twitter loading button
+                  RoundedLoadingButton(
+                    controller: twitterController, 
+                    onPressed: (){
+                      handleTwitterAuth();
+                    }, 
+                    successColor: Colors.blue,
+                    width: MediaQuery.of(context).size.width * 0.80,
+                    elevation: 0,
+                    borderRadius: 25,
+                    color: Colors.lightBlue,
+                    child: Wrap(
+                      children: const [
+                        Icon(
+                          FontAwesomeIcons.twitter,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        Text(
+                          "Continue with Twitter",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                 ],
               ),
@@ -147,6 +183,49 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  // handling twitter auth
+  Future handleTwitterAuth() async {
+    final sp = context.read<SignInProvider>();
+    final ip = context.read<InternetProvider>();
+    await ip.checkInternetConnection();
+
+    if(ip.hasInternet == false){
+      openSnackbar(context, "Check your Internet connection", Colors.red);
+      googleController.reset();
+    } else {
+      await sp.signInWithTwitter().then((value) {
+        if(sp.hasError == true) {
+          openSnackbar(context, sp.errorCode.toString(), Colors.red);
+          twitterController.reset();
+        }
+        else {
+          // checking whether user exists or not
+          sp.checkUserExists().then((value) async {
+            if(value == true) {
+              // user exists
+              await sp.getUserDataFromFirestore(sp.uid).then((value) => 
+                sp.saveDataToSharedPreferences()
+                .then((value) => sp.setSignIn().then((value) {
+                  twitterController.success();
+                  handleAfterSignIn();
+                })));
+            }
+            else {
+              // user does not exist
+              sp.saveDataToFirestore().then((value) => 
+                sp.saveDataToSharedPreferences()
+                .then((value) => sp.setSignIn().then((value) {
+                  twitterController.success();
+                  handleAfterSignIn();
+                })));
+            }
+          });
+        }
+      });
+    }
+
   }
 
   // handling google sigin in
