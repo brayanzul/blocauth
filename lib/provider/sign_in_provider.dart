@@ -286,4 +286,14 @@ class SignInProvider extends ChangeNotifier {
     final SharedPreferences s = await SharedPreferences.getInstance();
     s.clear();
   }
+
+  void phoneNumberUser(User user, email, name) {
+    _name = name;
+    _email = email;
+    _imageUrl = "null";
+    _uid = user.phoneNumber;
+    _provider = "PHONE";
+    notifyListeners();
+  }
+
 }
