@@ -1,6 +1,7 @@
 import 'package:blocauth/provider/internet_provider.dart';
 import 'package:blocauth/provider/sign_in_provider.dart';
 import 'package:blocauth/screens/home_screen.dart';
+import 'package:blocauth/screens/phoneauth_screen.dart';
 import 'package:blocauth/utils/config.dart';
 import 'package:blocauth/utils/next_screen.dart';
 import 'package:blocauth/utils/snack_bar.dart';
@@ -21,6 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final RoundedLoadingButtonController googleController = RoundedLoadingButtonController();
   final RoundedLoadingButtonController facebookController = RoundedLoadingButtonController();
   final RoundedLoadingButtonController twitterController = RoundedLoadingButtonController();
+  final RoundedLoadingButtonController phoneController = RoundedLoadingButtonController();
 
   @override
   Widget build(BuildContext context) {
@@ -174,7 +176,42 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  // phoneAuth loading button
+                  RoundedLoadingButton(
+                    controller: phoneController, 
+                    onPressed: (){
+                      nextScreenReplace(context, const PhoneAuthScreen());
+                      phoneController.reset();
+                    }, 
+                    successColor: Colors.black,
+                    width: MediaQuery.of(context).size.width * 0.80,
+                    elevation: 0,
+                    borderRadius: 25,
+                    color: Colors.black,
+                    child: Wrap(
+                      children: const [
+                        Icon(
+                          FontAwesomeIcons.phone,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                        SizedBox(
+                          width: 15,
+                        ),
+                        Text(
+                          "Sign in with Phone",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
 
